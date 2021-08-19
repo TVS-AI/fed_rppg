@@ -1,7 +1,7 @@
 import torch
 
-from nets.funcs.complexFunctions import complex_tanh
-from nets.layers.complexLayers import ComplexDropout, ComplexLinear
+from torchrppg.nets.funcs.complexFunctions import complex_tanh
+from torchrppg.nets.layers.complexLayers import ComplexDropout, ComplexLinear
 
 
 class LinearModel(torch.nn.Module):

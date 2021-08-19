@@ -1,11 +1,11 @@
 import h5py
 import numpy as np
 
-from DeepPhysDataset import DeepPhysDataset
-from PhysNetDataset import PhysNetDataset
+from torchrppg.dataset.DeepPhysDataset import DeepPhysDataset
+from torchrppg.dataset.PhysNetDataset import PhysNetDataset
 
 
-def dataset_loader(save_root_path: str = "/media/hdd1/dy_dataset/",
+def dataset_loader(save_root_path: str = "/media/hdd1/dy/dataset/",
                    model_name: str = "DeepPhys",
                    dataset_name: str = "UBFC",
                    option: str = "train"):

@@ -24,10 +24,6 @@ class MTTSDataset(Dataset):
         inputs = torch.stack([appearance_data,motion_data],dim=0)
         targets = torch.stack([hr_target,rr_target],dim=0)
 
-        if torch.cuda.is_available():
-            inputs = inputs.to('cuda')
-            targets = targets.to('cuda')
-
         return inputs, targets
 
     def __len__(self):

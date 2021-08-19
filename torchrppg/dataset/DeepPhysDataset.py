@@ -21,10 +21,6 @@ class DeepPhysDataset(Dataset):
 
         inputs = torch.stack([appearance_data,motion_data],dim=0)
 
-        if torch.cuda.is_available():
-            inputs = inputs.to('cuda')
-            target = target.to('cuda')
-
         return inputs, target
 
     def __len__(self):

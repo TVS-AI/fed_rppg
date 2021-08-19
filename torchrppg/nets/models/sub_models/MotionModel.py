@@ -1,6 +1,6 @@
 import torch
 
-from nets.blocks.blocks import TSM_Block
+from torchrppg.nets.blocks.blocks import TSM_Block
 
 
 class MotionModel(torch.nn.Module):
@@ -9,20 +9,20 @@ class MotionModel(torch.nn.Module):
         # Motion model
         self.m_conv1 = torch.nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size,
                                        stride=1, padding=1)
-        self.m_batch_Normalization1 = torch.nn.BatchNorm2d(out_channels)
+        self.m_batch_Normalization1 = torch.nn.BatchNorm2d(out_channels,track_running_stats=False)
         self.m_conv2 = torch.nn.Conv2d(in_channels=out_channels, out_channels=out_channels, kernel_size=kernel_size,
                                        stride=1, padding=1)
-        self.m_batch_Normalization2 = torch.nn.BatchNorm2d(out_channels)
+        self.m_batch_Normalization2 = torch.nn.BatchNorm2d(out_channels,track_running_stats=False)
         self.m_dropout1 = torch.nn.Dropout2d(p=0.50)
 
         self.m_avg1 = torch.nn.AvgPool2d(kernel_size=2, stride=2, padding=0)
         self.m_conv3 = torch.nn.Conv2d(in_channels=out_channels, out_channels=out_channels * 2, kernel_size=kernel_size,
                                        stride=1,
                                        padding=1)
-        self.m_batch_Normalization3 = torch.nn.BatchNorm2d(out_channels * 2)
+        self.m_batch_Normalization3 = torch.nn.BatchNorm2d(out_channels * 2,track_running_stats=False)
         self.m_conv4 = torch.nn.Conv2d(in_channels=out_channels * 2, out_channels=out_channels * 2,
                                        kernel_size=kernel_size, stride=1, padding=1)
-        self.m_batch_Normalization4 = torch.nn.BatchNorm2d(out_channels * 2)
+        self.m_batch_Normalization4 = torch.nn.BatchNorm2d(out_channels * 2,track_running_stats=False)
         self.m_dropout2 = torch.nn.Dropout2d(p=0.50)
         self.m_avg2 = torch.nn.AvgPool2d(kernel_size=2, stride=2, padding=0)
 

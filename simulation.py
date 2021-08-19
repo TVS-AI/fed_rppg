@@ -10,6 +10,7 @@ from flwr.server.strategy import FedAvg
 import torch
 import dataset
 from SimpleNet import SimpleNet
+from torchrppg.nets.models.DeepPhys import DeepPhys
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -27,7 +28,7 @@ def start_client(dataset: DATASET) -> None:
     """Start a single client with the provided dataset."""
 
     # Load and compile a Keras model for CIFAR-10
-    net = SimpleNet().to(DEVICE)
+    net = DeepPhys().to(DEVICE)
 
     # Unpack the CIFAR-10 dataset partition
     trainloader, testloader = dataset
@@ -57,8 +58,10 @@ def start_client(dataset: DATASET) -> None:
 
 def train(net, trainloader, epochs):
     """Train the network on the training set."""
-    criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+    # criterion = torch.nn.CrossEntropyLoss()
+    # optimizer = torch.optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+    criterion = torch.nn.MSELoss()
+    optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
     net.train()
     for _ in range(epochs):
         for images, labels in trainloader:
@@ -71,7 +74,7 @@ def train(net, trainloader, epochs):
 
 def test(net, testloader):
     """Validate the network on the entire test set."""
-    criterion = torch.nn.CrossEntropyLoss()
+    criterion = torch.nn.MSELoss()
     correct, total, loss = 0, 0, 0.0
     net.eval()
     with torch.no_grad():
