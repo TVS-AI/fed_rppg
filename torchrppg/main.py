@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
 
-from dataset.dataset_loader import dataset_loader
+from torchrppg.dataset.dataset_loader import dataset_loader
 from log import log_info_time
 from loss import loss_fn
 from models import is_model_support, get_model, summary
