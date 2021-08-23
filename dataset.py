@@ -42,7 +42,7 @@ def ubfc_deepphy_to_numpy() -> Tuple[XY, XY]:
 
     xy_test_input = []
     xy_test_target = []
-    testSet = dataset_loader(option="train")
+    testSet = dataset_loader(option="test")
     for testData in testSet:
         xy_test_input.append(testData[0].numpy())
         xy_test_target.append(testData[1].numpy())
