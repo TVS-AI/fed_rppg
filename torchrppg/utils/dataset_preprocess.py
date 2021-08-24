@@ -7,7 +7,7 @@ from utils.image_preprocess import Deepphys_preprocess_Video, PhysNet_preprocess
 from utils.text_preprocess import Deepphys_preprocess_Label, PhysNet_preprocess_Label
 
 
-def preprocessing(save_root_path: str = "/media/hdd1/dy_dataset/",
+def preprocessing(save_root_path: str = "/media/hdd1/dy/dataset/",
                   model_name: str = "DeepPhys",
                   data_root_path: str = "/media/hdd1/",
                   dataset_name: str = "UBFC",
@@ -20,6 +20,9 @@ def preprocessing(save_root_path: str = "/media/hdd1/dy_dataset/",
     :param train_ratio: data split [ train ratio : 1 - train ratio]
     :return:
     """
+
+    print("preprocessing start!")
+
     dataset_root_path = data_root_path + dataset_name
 
     manager = multiprocessing.Manager()
@@ -28,6 +31,8 @@ def preprocessing(save_root_path: str = "/media/hdd1/dy_dataset/",
     data_list = [data for data in os.listdir(dataset_root_path) if data.__contains__("subject")]
 
     process = []
+
+    print(data_list)
 
     # multiprocessing
     for index, data_path in enumerate(data_list):

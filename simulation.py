@@ -9,13 +9,20 @@ import numpy as np
 from flwr.server.strategy import FedAvg
 import torch
 import dataset
-from SimpleNet import SimpleNet
-from torchrppg.nets.models.DeepPhys import DeepPhys
+import json
+from torchrppg.models import get_model
+from torchrppg.optim import get_optimizer
+from torchrppg.loss import loss_fn
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 DATASET = Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]
 
+with open('params.json') as f:
+    jsonObject = json.load(f)
+    params = jsonObject.get("params")
+    hyper_params = jsonObject.get("hyper_params")
+    model_params = jsonObject.get("model_params")
 
 def start_server(num_rounds: int, num_clients: int, fraction_fit: float):
     """Start the server with a slightly adjusted FedAvg strategy."""
@@ -27,10 +34,8 @@ def start_server(num_rounds: int, num_clients: int, fraction_fit: float):
 def start_client(dataset: DATASET) -> None:
     """Start a single client with the provided dataset."""
 
-    # Load and compile a Keras model for CIFAR-10
-    net = DeepPhys().to(DEVICE)
+    net = get_model(model_params["name"]).to(DEVICE)
 
-    # Unpack the CIFAR-10 dataset partition
     trainloader, testloader = dataset
 
     class CifarClient(fl.client.NumPyClient):
@@ -58,10 +63,9 @@ def start_client(dataset: DATASET) -> None:
 
 def train(net, trainloader, epochs):
     """Train the network on the training set."""
-    # criterion = torch.nn.CrossEntropyLoss()
-    # optimizer = torch.optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-    criterion = torch.nn.MSELoss()
-    optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
+    optimizer = get_optimizer(net.parameters(), hyper_params["learning_rate"], hyper_params["optimizer"])
+
+    criterion = loss_fn(hyper_params["loss_fn"])
     net.train()
     for _ in range(epochs):
         for images, labels in trainloader:
@@ -105,7 +109,7 @@ def run_simulation(num_rounds: int, num_clients: int, fraction_fit: float):
     time.sleep(2)
 
     # Load the dataset partitions
-    partitions = dataset.load(num_clients)
+    partitions = dataset.load(num_clients,params['train_batch_size'],params['train_shuffle'])
 
     # Start all the clients
     for partition in partitions:
