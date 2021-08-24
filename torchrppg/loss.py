@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.modules.loss as loss
 
-from log import log_warning
+from torchrppg.log import log_warning
 
 
 def loss_fn(loss_fn: str = "mse"):

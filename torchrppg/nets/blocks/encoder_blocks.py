@@ -1,6 +1,6 @@
 import torch.nn
 
-from nets.blocks.blocks import ConvBlock3D
+from torchrppg.nets.blocks.blocks import ConvBlock3D
 
 
 class encoder_block(torch.nn.Module):

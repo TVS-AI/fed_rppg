@@ -1,8 +1,8 @@
 import torch
 
-from nets.models.sub_models.AppearanceModel import AppearanceModel_DA
-from nets.models.sub_models.LinearModel import LinearModel
-from nets.models.sub_models.MotionModel import MotionModel
+from torchrppg.nets.models.sub_models.AppearanceModel import AppearanceModel_DA
+from torchrppg.nets.models.sub_models.LinearModel import LinearModel
+from torchrppg.nets.models.sub_models.MotionModel import MotionModel
 
 
 class DeepPhys_DA(torch.nn.Module):

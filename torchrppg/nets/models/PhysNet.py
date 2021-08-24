@@ -1,9 +1,9 @@
 import torch
 
-from nets.blocks.decoder_blocks import decoder_block
-from nets.blocks.encoder_blocks import encoder_block
-from nets.blocks.cnn_blocks import cnn_blocks
-from nets.modules.modules import ConvLSTM
+from torchrppg.nets.blocks.decoder_blocks import decoder_block
+from torchrppg.nets.blocks.encoder_blocks import encoder_block
+from torchrppg.nets.blocks.cnn_blocks import cnn_blocks
+from torchrppg.nets.modules.modules import ConvLSTM
 
 
 class PhysNet(torch.nn.Module):

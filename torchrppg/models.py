@@ -1,11 +1,11 @@
 import torchinfo
 import torchsummary
 
-from log import log_warning, log_info
-from nets.models.DeepPhys import DeepPhys
-from nets.models.DeepPhys_DA import DeepPhys_DA
-from nets.models.PhysNet import PhysNet
-from nets.models.PhysNet import PhysNet_2DCNN_LSTM
+from torchrppg.log import log_warning, log_info
+from torchrppg.nets.models.DeepPhys import DeepPhys
+from torchrppg.nets.models.DeepPhys_DA import DeepPhys_DA
+from torchrppg.nets.models.PhysNet import PhysNet
+from torchrppg.nets.models.PhysNet import PhysNet_2DCNN_LSTM
 
 
 def get_model(model_name: str = "DeepPhys"):

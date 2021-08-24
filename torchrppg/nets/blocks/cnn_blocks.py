@@ -1,7 +1,7 @@
 import torch.nn
 
-from nets.blocks.blocks import ConvBlock2D
-from nets.blocks.blocks import ConvBlock3D
+from torchrppg.nets.blocks.blocks import ConvBlock2D
+from torchrppg.nets.blocks.blocks import ConvBlock3D
 
 class cnn_blocks(torch.nn.Module):
     def __init__(self):

@@ -1,6 +1,6 @@
 import torch.nn
 
-from nets.blocks.blocks import DeConvBlock3D
+from torchrppg.nets.blocks.blocks import DeConvBlock3D
 
 
 class decoder_block(torch.nn.Module):
