@@ -12,7 +12,7 @@ from torchrppg.dataset.dataset_loader import dataset_loader
 from log import log_info_time
 from loss import loss_fn
 from models import is_model_support, get_model, summary
-from optim import optimizer
+from optim import get_optimizer
 from torch.optim import lr_scheduler
 from utils.dataset_preprocess import preprocessing
 from utils.funcs import normalize, plot_graph, detrend
@@ -133,7 +133,7 @@ Setting Optimizer
 '''
 if __TIME__:
     start_time = time.time()
-optimizer = optimizer(model.parameters(), hyper_params["learning_rate"], hyper_params["optimizer"])
+optimizer = get_optimizer(model.parameters(), hyper_params["learning_rate"], hyper_params["optimizer"])
 scheduler = lr_scheduler.ExponentialLR(optimizer,gamma=0.99)
 if __TIME__:
     log_info_time("setting optimizer time \t: ", datetime.timedelta(seconds=time.time() - start_time))

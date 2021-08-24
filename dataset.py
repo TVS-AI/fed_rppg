@@ -11,26 +11,6 @@ XY = Tuple[np.ndarray, np.ndarray]
 XYList = List[XY]
 PartitionedDataset = List[Tuple[XY, XY]]
 
-
-def cifar_to_numpy() -> Tuple[XY, XY]:
-    """Download dataset from torchvision and convert it to numpy array."""
-    transform = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
-    )
-
-    trainset = torchvision.datasets.CIFAR10(
-        root="./data", train=True, download=True, transform=transform
-    )
-    testset = torchvision.datasets.CIFAR10(
-        root="./data", train=False, download=True, transform=transform
-    )
-
-    # convert data shape from 32x32x3 to 3x32x32 by transpose
-    xy_train = trainset.data.transpose(0, 3, 1, 2), np.array(trainset.targets)
-    xy_test = testset.data.transpose(0, 3, 1, 2), np.array(testset.targets)
-
-    return xy_train, xy_test
-
 def ubfc_deepphy_to_numpy() -> Tuple[XY, XY]:
     xy_train_input = []
     xy_train_target = []
@@ -72,10 +52,9 @@ def create_partitions(source_dataset: XY, num_partitions: int) -> XYList:
     return xy_partitions
 
 
-def load(num_partitions: int) -> PartitionedDataset:
+def load(num_partitions: int, batch_size: int, shuffle: bool) -> PartitionedDataset:
     """Create partitioned version of CIFAR-10."""
     xy_train, xy_test = ubfc_deepphy_to_numpy()
-    #xy_train, xy_test = cifar_to_numpy()
     xy_train_partitions = create_partitions(xy_train, num_partitions)
     xy_test_partitions = create_partitions(xy_test, num_partitions)
     list_of_dataloaders = []
@@ -84,14 +63,14 @@ def load(num_partitions: int) -> PartitionedDataset:
         x_test, y_test = xy_test
 
         train_dl = DataLoader(
-            # TensorDataset(torch.Tensor(x_train), torch.LongTensor(y_train)),
             TensorDataset(torch.Tensor(x_train), torch.FloatTensor(y_train)),
-            batch_size=32,
+            batch_size=batch_size,
+            shuffle=shuffle
         )
         test_dl = DataLoader(
-            # TensorDataset(torch.Tensor(x_test), torch.LongTensor(y_test)),
             TensorDataset(torch.Tensor(x_test), torch.FloatTensor(y_test)),
-            batch_size=32
+            batch_size=batch_size,
+            shuffle=shuffle
         )
         list_of_dataloaders.append((train_dl, test_dl))
 
