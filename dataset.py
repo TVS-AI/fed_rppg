@@ -11,22 +11,25 @@ XY = Tuple[np.ndarray, np.ndarray]
 XYList = List[XY]
 PartitionedDataset = List[Tuple[XY, XY]]
 
-def ubfc_deepphy_to_numpy() -> Tuple[XY, XY]:
+def get_train_test_numpy(model_name: str, dataset_name: str) -> Tuple[XY, XY]:
+    if model_name.__contains__("PhysNet"):
+        model_name = "PhysNet"
+
     xy_train_input = []
     xy_train_target = []
-    trainSet = dataset_loader(option="train")
+    trainSet = dataset_loader(option="train",model_name=model_name,dataset_name=dataset_name)
     for trainData in trainSet:
         xy_train_input.append(trainData[0].numpy())
         xy_train_target.append(trainData[1].numpy())
-    xy_train = np.array(xy_train_input), np.array(xy_train_target).reshape(-1)
+    xy_train = np.array(xy_train_input), np.array(xy_train_target)
 
     xy_test_input = []
     xy_test_target = []
-    testSet = dataset_loader(option="test")
+    testSet = dataset_loader(option="test",model_name=model_name,dataset_name=dataset_name)
     for testData in testSet:
         xy_test_input.append(testData[0].numpy())
         xy_test_target.append(testData[1].numpy())
-    xy_test = np.array(xy_test_input), np.array(xy_test_target).reshape(-1)
+    xy_test = np.array(xy_test_input), np.array(xy_test_target)
 
     return xy_train, xy_test
 
@@ -52,9 +55,11 @@ def create_partitions(source_dataset: XY, num_partitions: int) -> XYList:
     return xy_partitions
 
 
-def load(num_partitions: int, batch_size: int, shuffle: bool) -> PartitionedDataset:
+def load(num_partitions: int, batch_size: int, shuffle: bool, model_name: str,dataset_name: str) -> PartitionedDataset:
     """Create partitioned version of CIFAR-10."""
-    xy_train, xy_test = ubfc_deepphy_to_numpy()
+
+    xy_train, xy_test = get_train_test_numpy(model_name=model_name, dataset_name=dataset_name)
+
     xy_train_partitions = create_partitions(xy_train, num_partitions)
     xy_test_partitions = create_partitions(xy_test, num_partitions)
     list_of_dataloaders = []

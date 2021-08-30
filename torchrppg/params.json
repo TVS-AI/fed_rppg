@@ -12,7 +12,7 @@
         "save_root_path": "/media/hdd1/dy/dataset/",
         "data_root_path": "/media/hdd1/",
         "dataset_name": "UBFC",
-        "checkpoint_path" : "/home/js/Desktop/tmp_local/checkpoint/",
+        "checkpoint_path" : "/home/hs/Desktop/tmp_local/checkpoint/",
         "train_ratio": 0.7,
         "train_ratio_comment" : "generate train dataset using train_ratio",
         "validation_ratio": 0.9,

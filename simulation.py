@@ -49,6 +49,10 @@ def start_client(dataset: DATASET, client_number: int, total_gpu: int) -> None:
         def set_parameters(self, parameters):
             params_dict = zip(net.state_dict().keys(), parameters)
             state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
+            for k in state_dict.keys():
+                v = state_dict[k]
+                if k.__contains__("num_batches_tracked") and len(v.shape) == 1 and v.shape[0] == 0:
+                    state_dict[k] = torch.tensor([0], dtype=torch.long)
             net.load_state_dict(state_dict, strict=True)
 
         def fit(self, parameters, config):
@@ -75,27 +79,28 @@ def train(net, trainloader, epochs, device: torch.device):
         for images, labels in trainloader:
             images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad()
-            loss = criterion(net(images), labels)
+            outputs = net(images)
+            labels = labels.view(outputs.shape)
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
 
 def test(net, testloader):
     """Validate the network on the entire test set."""
-    criterion = torch.nn.MSELoss()
-    correct, total, loss = 0, 0, 0.0
+    criterion = loss_fn(hyper_params["loss_fn"])
+    loss = 0.0
     net.eval()
     device = next(net.parameters()).get_device()
     with torch.no_grad():
         for data in testloader:
             images, labels = data[0].to(device), data[1].to(device)
             outputs = net(images)
-            loss += criterion(outputs, labels).item()
+            labels = labels.view(outputs.shape)
+            error = criterion(outputs, labels).item()
+            loss += error
             _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
-    accuracy = correct / total
-    return loss, accuracy
+    return loss, 0
 
 
 def run_simulation(num_rounds: int, num_clients: int, fraction_fit: float):
@@ -114,7 +119,11 @@ def run_simulation(num_rounds: int, num_clients: int, fraction_fit: float):
     time.sleep(2)
 
     # Load the dataset partitions
-    partitions = dataset.load(num_clients,params['train_batch_size'],params['train_shuffle'])
+    partitions = dataset.load(num_partitions=num_clients,
+                              batch_size=params['train_batch_size'],
+                              shuffle=params['train_shuffle'],
+                              model_name=model_params['name'],
+                              dataset_name=params['dataset_name'])
 
     # Start all the clients
     for client_number, partition in enumerate(partitions):

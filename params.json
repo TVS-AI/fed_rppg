@@ -17,7 +17,7 @@
     },
     "hyper_params":
     {
-        "loss_fn": "mse",
+        "loss_fn": "neg_pearson",
         "loss_fn_comment":
                [
                    "mse","L1","neg_pearson","multi_margin","bce","huber","cosine_embedding",
@@ -32,7 +32,7 @@
                     "adam","sgd","rms_prop","ada_delta","ada_grad","ada_max",
                     "ada_mw","a_sgd","lbfgs","n_adam","r_adam","rprop","sparse_adam"
                 ],
-        "learning_rate": 1,
+        "learning_rate": 0.001,
         "learning_rate_comment": [
             "DeepPhys : lr = 1",
             "PhysNet : lr = 0.001"
@@ -41,7 +41,7 @@
     },
     "model_params":
     {
-        "name": "DeepPhys",
+        "name": "PhysNet",
         "name_comment":
                 [
                     "DeepPhys",
