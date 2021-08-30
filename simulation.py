@@ -14,8 +14,6 @@ from torchrppg.models import get_model
 from torchrppg.optim import get_optimizer
 from torchrppg.loss import loss_fn
 
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
 DATASET = Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]
 
 with open('params.json') as f:
@@ -23,6 +21,8 @@ with open('params.json') as f:
     params = jsonObject.get("params")
     hyper_params = jsonObject.get("hyper_params")
     model_params = jsonObject.get("model_params")
+    available_gpu_number = params.get("available_gpu")
+
 
 def start_server(num_rounds: int, num_clients: int, fraction_fit: float):
     """Start the server with a slightly adjusted FedAvg strategy."""
@@ -31,14 +31,18 @@ def start_server(num_rounds: int, num_clients: int, fraction_fit: float):
     fl.server.start_server(strategy=strategy, config={"num_rounds": num_rounds})
 
 
-def start_client(dataset: DATASET) -> None:
+def start_client(dataset: DATASET, client_number: int, total_gpu: int) -> None:
     """Start a single client with the provided dataset."""
+    total_gpu = len(available_gpu_number) if len(available_gpu_number) < total_gpu else total_gpu
+
+    DEVICE = torch.device(
+        ("cuda:" + available_gpu_number[(client_number + 1) % total_gpu]) if torch.cuda.is_available() else "cpu")
 
     net = get_model(model_params["name"]).to(DEVICE)
 
     trainloader, testloader = dataset
 
-    class CifarClient(fl.client.NumPyClient):
+    class RPPGClient(fl.client.NumPyClient):
         def get_parameters(self):
             return [val.cpu().numpy() for _, val in net.state_dict().items()]
 
@@ -49,7 +53,7 @@ def start_client(dataset: DATASET) -> None:
 
         def fit(self, parameters, config):
             self.set_parameters(parameters)
-            train(net, trainloader, epochs=1)
+            train(net, trainloader, 1, DEVICE)
             return self.get_parameters(), len(trainloader), {}
 
         def evaluate(self, parameters, config):
@@ -58,10 +62,10 @@ def start_client(dataset: DATASET) -> None:
             return float(loss), len(testloader), {"accuracy": float(accuracy)}
 
     # Start Flower client
-    fl.client.start_numpy_client("0.0.0.0:8080", client=CifarClient())
+    fl.client.start_numpy_client("0.0.0.0:8080", client=RPPGClient())
 
 
-def train(net, trainloader, epochs):
+def train(net, trainloader, epochs, device: torch.device):
     """Train the network on the training set."""
     optimizer = get_optimizer(net.parameters(), hyper_params["learning_rate"], hyper_params["optimizer"])
 
@@ -69,7 +73,7 @@ def train(net, trainloader, epochs):
     net.train()
     for _ in range(epochs):
         for images, labels in trainloader:
-            images, labels = images.to(DEVICE), labels.to(DEVICE)
+            images, labels = images.to(device), labels.to(device)
             optimizer.zero_grad()
             loss = criterion(net(images), labels)
             loss.backward()
@@ -81,9 +85,10 @@ def test(net, testloader):
     criterion = torch.nn.MSELoss()
     correct, total, loss = 0, 0, 0.0
     net.eval()
+    device = next(net.parameters()).get_device()
     with torch.no_grad():
         for data in testloader:
-            images, labels = data[0].to(DEVICE), data[1].to(DEVICE)
+            images, labels = data[0].to(device), data[1].to(device)
             outputs = net(images)
             loss += criterion(outputs, labels).item()
             _, predicted = torch.max(outputs.data, 1)
@@ -112,8 +117,9 @@ def run_simulation(num_rounds: int, num_clients: int, fraction_fit: float):
     partitions = dataset.load(num_clients,params['train_batch_size'],params['train_shuffle'])
 
     # Start all the clients
-    for partition in partitions:
-        client_process = Process(target=start_client, args=(partition,))
+    for client_number, partition in enumerate(partitions):
+        client_process = Process(target=start_client,
+                                 args=(partition, client_number, params['total_gpu'],))
         client_process.start()
         processes.append(client_process)
 
@@ -124,4 +130,6 @@ def run_simulation(num_rounds: int, num_clients: int, fraction_fit: float):
 
 if __name__ == "__main__":
     torch.multiprocessing.set_start_method("spawn")
-    run_simulation(num_rounds=100, num_clients=10, fraction_fit=0.5)
+    run_simulation(num_rounds=params['num_rounds'],
+                   num_clients=params['num_clients'],
+                   fraction_fit=params['fraction_fit'])

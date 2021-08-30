@@ -9,7 +9,7 @@
     },
     "params":
     {
-        "save_root_path": "/media/hdd1/js_dataset/",
+        "save_root_path": "/media/hdd1/dy/dataset/",
         "data_root_path": "/media/hdd1/",
         "dataset_name": "UBFC",
         "checkpoint_path" : "/home/js/Desktop/tmp_local/checkpoint/",

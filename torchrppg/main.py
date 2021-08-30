@@ -151,6 +151,9 @@ for epoch in range(hyper_params["epochs"]):
         model.train()
         running_loss = 0.0
         for inputs, target in tepoch:
+            if torch.cuda.is_available():
+                inputs = inputs.to('cuda')
+                target = target.to('cuda')
             tepoch.set_description(f"Train Epoch {epoch}")
             outputs = model(inputs)
             loss = criterion(outputs, target)
@@ -168,6 +171,9 @@ for epoch in range(hyper_params["epochs"]):
         running_loss = 0.0
         with torch.no_grad():
             for inputs, target in tepoch:
+                if torch.cuda.is_available():
+                    inputs = inputs.to('cuda')
+                    target = target.to('cuda')
                 tepoch.set_description(f"Validation")
                 outputs = model(inputs)
                 loss = criterion(outputs, target)
@@ -178,9 +184,9 @@ for epoch in range(hyper_params["epochs"]):
                 checkpoint = {'Epoch': epoch,
                               'state_dict': model.state_dict(),
                               'optimizer': optimizer.state_dict()}
-                torch.save(checkpoint, params["checkpoint_path"] + model_params["name"] + "/"
-                           + params["dataset_name"] + "_" + str(epoch) + "_"
-                           + str(min_val_loss) + '.pth')
+                # torch.save(checkpoint, params["checkpoint_path"] + model_params["name"] + "/"
+                #            + params["dataset_name"] + "_" + str(epoch) + "_"
+                #            + str(min_val_loss) + '.pth')
                 min_val_loss_model = copy.deepcopy(model)
 
     if epoch + 1 == hyper_params["epochs"] or epoch % 3 == 0:
@@ -194,6 +200,9 @@ for epoch in range(hyper_params["epochs"]):
             target_array = []
             with torch.no_grad():
                 for inputs, target in tepoch:
+                    if torch.cuda.is_available():
+                        inputs = inputs.to('cuda')
+                        target = target.to('cuda')
                     tepoch.set_description(f"test")
                     outputs = model(inputs)
                     loss = criterion(outputs, target)

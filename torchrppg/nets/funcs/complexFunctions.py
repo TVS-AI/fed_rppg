@@ -152,7 +152,7 @@ def complex_dropout(input, p=0.5, training=True):
     # need to have the same dropout mask for real and imaginary part,
     # this not a clean solution!
     # mask = torch.ones_like(input).type(torch.float32)
-    mask = torch.ones(*input.shape, dtype=torch.float32).to('cuda:0')
+    mask = torch.ones(*input.shape, dtype=torch.float32).to(input.get_device())
     mask = dropout(mask, p, training) * 1 / (1 - p)
     mask.type(input.dtype)
     return mask * input
