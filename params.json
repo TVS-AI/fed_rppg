@@ -8,7 +8,7 @@
         "test_batch_size" : 32,
         "test_shuffle" : 0,
         "num_clients" : 10,
-        "num_rounds" : 50,
+        "num_rounds" : 100,
         "fraction_fit" : 0.5,
         "total_gpu" : 10,
         "available_gpu" : [
@@ -34,10 +34,10 @@
                 ],
         "learning_rate": 0.001,
         "learning_rate_comment": [
-            "DeepPhys : lr = 1",
+            "DeepPhys : lr = 0.01",
             "PhysNet : lr = 0.001"
         ],
-        "epochs" : 1
+        "epochs" : 2
     },
     "model_params":
     {

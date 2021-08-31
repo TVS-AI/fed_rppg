@@ -27,6 +27,7 @@ with open('params.json') as f:
 def start_server(num_rounds: int, num_clients: int, fraction_fit: float):
     """Start the server with a slightly adjusted FedAvg strategy."""
     strategy = FedAvg(min_available_clients=num_clients, fraction_fit=fraction_fit)
+
     # Exposes the server by default on port 8080
     fl.server.start_server(strategy=strategy, config={"num_rounds": num_rounds})
 
@@ -57,7 +58,7 @@ def start_client(dataset: DATASET, client_number: int, total_gpu: int) -> None:
 
         def fit(self, parameters, config):
             self.set_parameters(parameters)
-            train(net, trainloader, 1, DEVICE)
+            train(net, trainloader, hyper_params["epochs"], DEVICE)
             return self.get_parameters(), len(trainloader), {}
 
         def evaluate(self, parameters, config):
